@@ -14,13 +14,16 @@ public class StartupRunner implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(StartupRunner.class);
 
     private final MeetingIngestionService meetingService;
+    private final SessionIngestionService sessionService;
 
-    public StartupRunner(MeetingIngestionService meetingService) {
+    public StartupRunner(MeetingIngestionService meetingService, SessionIngestionService sessionService) {
         this.meetingService = meetingService;
+        this.sessionService = sessionService;
     }
 
     @Override
     public void run(String... args) {
         meetingService.ingestMeetings(2024);
+        sessionService.ingestSessions(1240);
     }
 }
