@@ -26,7 +26,7 @@ public class MeetingIngestionService {
 
         List<Meeting> filteredMeetings = meetings.stream().filter(meeting -> meeting.meetingKey() != null).toList();
 
-        meetingRepository.saveAll(filteredMeetings);
+        filteredMeetings.forEach(meetingRepository::upsert);
         log.info("Ingested {} meetings", filteredMeetings.size());
         return filteredMeetings.size();
     }

@@ -24,7 +24,7 @@ public class SessionIngestionService {
     public int ingestSessions(int meetingKey) {
         List<Session> filteredSessions = openF1Client.fetchSessions(meetingKey).stream().filter(session -> session.sessionKey() != null).toList();
 
-        sessionRepository.saveAll(filteredSessions);
+        filteredSessions.forEach(sessionRepository::upsert);
         log.info("Sessions ingested, total count: {}", filteredSessions.size());
         return filteredSessions.size();
     }
