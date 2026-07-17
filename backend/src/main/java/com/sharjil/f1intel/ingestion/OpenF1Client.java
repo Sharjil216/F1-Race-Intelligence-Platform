@@ -1,10 +1,12 @@
 package com.sharjil.f1intel.ingestion;
 
+
 import com.sharjil.f1intel.domain.Meeting;
 import com.sharjil.f1intel.domain.Session;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -12,30 +14,40 @@ import java.util.List;
 public class OpenF1Client {
 
     private final RestClient restClient;
+    private final JsonMapper jsonMapper;
 
-    public OpenF1Client(RestClient openF1RestClient) {
+    public OpenF1Client(RestClient openF1RestClient, JsonMapper openF1JsonMapper) {
         this.restClient = openF1RestClient;
+        this.jsonMapper = openF1JsonMapper;
     }
 
-    public List<Meeting> fetchMeetings(int year) {
-        return restClient
+    public FetchResult<Meeting> fetchMeetings(int year) {
+        String raw =  restClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/meetings")
                         .queryParam("year", year)
                         .build())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<Meeting>>() {});
+                .body(String.class);
+
+        List<Meeting> parsed = jsonMapper.readValue(raw, new TypeReference<List<Meeting>>() {});
+
+        return new FetchResult<>(raw, parsed);
     }
 
-    public List<Session> fetchSessions(int meetingKey) {
-        return restClient
+    public FetchResult<Session> fetchSessions(int meetingKey) {
+        String raw =  restClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/sessions")
                         .queryParam("meeting_key", meetingKey)
                         .build())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<Session>>() {});
+                .body(String.class);
+
+        List<Session> parsed = jsonMapper.readValue(raw, new TypeReference<List<Session>>() {});
+
+        return new FetchResult<>(raw, parsed);
     }
 }

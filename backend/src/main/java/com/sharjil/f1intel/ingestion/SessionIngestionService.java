@@ -1,6 +1,8 @@
 package com.sharjil.f1intel.ingestion;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sharjil.f1intel.domain.Session;
+import com.sharjil.f1intel.repository.RawSnapshotRepository;
 import com.sharjil.f1intel.repository.SessionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +17,25 @@ public class SessionIngestionService {
 
     private final OpenF1Client openF1Client;
     private final SessionRepository sessionRepository;
+    private final RawSnapshotRepository rawSnapshotRepository;
 
-    public SessionIngestionService(OpenF1Client openF1Client, SessionRepository sessionRepository) {
+    public SessionIngestionService(OpenF1Client openF1Client, SessionRepository sessionRepository, RawSnapshotRepository rawSnapshotRepository) {
         this.openF1Client = openF1Client;
         this.sessionRepository = sessionRepository;
+        this.rawSnapshotRepository = rawSnapshotRepository;
     }
 
     public int ingestSessions(int meetingKey) {
-        List<Session> filteredSessions = openF1Client.fetchSessions(meetingKey).stream().filter(session -> session.sessionKey() != null).toList();
+        FetchResult<Session> result = openF1Client.fetchSessions(meetingKey);   // ONE call
 
-        filteredSessions.forEach(sessionRepository::upsert);
-        log.info("Sessions ingested, total count: {}", filteredSessions.size());
-        return filteredSessions.size();
+        List<Session> filteredSession = result.parsed().stream()
+                .filter(session -> session.sessionKey() != null)
+                .toList();
+
+        rawSnapshotRepository.insertSnapshot("sessions", result.rawPayload(), "meeting_key=" + meetingKey);
+        filteredSession.forEach(sessionRepository::upsert);
+        log.info("Ingested {} sessions", filteredSession.size());
+
+        return filteredSession.size();
     }
 }
