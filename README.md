@@ -1,0 +1,1 @@
+[![CI](https://github.com/Sharjil216/F1-Race-Intelligence-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Sharjil216/F1-Race-Intelligence-Platform/actions/workflows/ci.yml)
