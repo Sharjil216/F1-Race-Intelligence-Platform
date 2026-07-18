@@ -1,6 +1,7 @@
 package com.sharjil.f1intel.ingestion;
 
 
+import com.sharjil.f1intel.domain.Driver;
 import com.sharjil.f1intel.domain.Meeting;
 import com.sharjil.f1intel.domain.Session;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,21 @@ public class OpenF1Client {
                 .body(String.class);
 
         List<Session> parsed = jsonMapper.readValue(raw, new TypeReference<List<Session>>() {});
+
+        return new FetchResult<>(raw, parsed);
+    }
+
+    public FetchResult<Driver> fetchDrivers(int sessionKey) {
+        String raw =  restClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/drivers")
+                        .queryParam("session_key", sessionKey)
+                        .build())
+                .retrieve()
+                .body(String.class);
+
+        List<Driver> parsed = jsonMapper.readValue(raw, new TypeReference<List<Driver>>() {});
 
         return new FetchResult<>(raw, parsed);
     }

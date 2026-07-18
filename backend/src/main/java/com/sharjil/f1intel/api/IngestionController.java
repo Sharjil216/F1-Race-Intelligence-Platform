@@ -1,5 +1,6 @@
 package com.sharjil.f1intel.api;
 
+import com.sharjil.f1intel.ingestion.DriverIngestionService;
 import com.sharjil.f1intel.ingestion.MeetingIngestionService;
 import com.sharjil.f1intel.ingestion.SessionIngestionService;
 import com.sharjil.f1intel.repository.MeetingRepository;
@@ -14,10 +15,12 @@ public class IngestionController {
 
     private final MeetingIngestionService meetingIngestionService;
     private final SessionIngestionService sessionIngestionService;
+    private final DriverIngestionService driverIngestionService;
 
-    public IngestionController(MeetingIngestionService meetingIngestionService, MeetingRepository meetingRepository, SessionIngestionService sessionIngestionService, SessionRepository sessionRepository) {
+    public IngestionController(MeetingIngestionService meetingIngestionService, SessionIngestionService sessionIngestionService, DriverIngestionService driverIngestionService) {
         this.meetingIngestionService = meetingIngestionService;
         this.sessionIngestionService = sessionIngestionService;
+        this.driverIngestionService = driverIngestionService;
     }
 
     @PostMapping("/meetings")
@@ -32,6 +35,13 @@ public class IngestionController {
         int ingested = sessionIngestionService.ingestSessions(meetingKey);
 
         return new IngestionResult("sessions", ingested);
+    }
+
+    @PostMapping("/drivers")
+    public IngestionResult ingestDrivers(int sessionKey) {
+        int ingested = driverIngestionService.ingestDrivers(sessionKey);
+
+        return new IngestionResult("drivers", ingested);
     }
 
     public record IngestionResult(String endpoint, int ingested) {}
