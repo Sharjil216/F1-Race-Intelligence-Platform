@@ -5,9 +5,10 @@ import com.sharjil.f1intel.domain.Lap;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-public interface LapRepository extends CrudRepository<Lap, Long> {
+public interface LapRepository extends Repository<Lap, Long> {
 
     @Modifying
     @Query("""
