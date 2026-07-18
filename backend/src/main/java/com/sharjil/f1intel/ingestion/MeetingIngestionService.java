@@ -2,7 +2,6 @@ package com.sharjil.f1intel.ingestion;
 
 
 import com.sharjil.f1intel.domain.Meeting;
-import com.sharjil.f1intel.domain.RawSnapshot;
 import com.sharjil.f1intel.repository.MeetingRepository;
 import com.sharjil.f1intel.repository.RawSnapshotRepository;
 import org.slf4j.Logger;

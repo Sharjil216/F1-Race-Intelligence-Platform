@@ -4,8 +4,6 @@ import com.sharjil.f1intel.ingestion.DriverIngestionService;
 import com.sharjil.f1intel.ingestion.LapIngestionService;
 import com.sharjil.f1intel.ingestion.MeetingIngestionService;
 import com.sharjil.f1intel.ingestion.SessionIngestionService;
-import com.sharjil.f1intel.repository.MeetingRepository;
-import com.sharjil.f1intel.repository.SessionRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

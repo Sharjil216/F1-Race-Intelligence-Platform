@@ -1,6 +1,5 @@
 package com.sharjil.f1intel.ingestion;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sharjil.f1intel.domain.Session;
 import com.sharjil.f1intel.repository.RawSnapshotRepository;
 import com.sharjil.f1intel.repository.SessionRepository;

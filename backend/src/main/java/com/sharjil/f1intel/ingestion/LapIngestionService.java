@@ -1,8 +1,6 @@
 package com.sharjil.f1intel.ingestion;
 
-import com.sharjil.f1intel.domain.Driver;
 import com.sharjil.f1intel.domain.Lap;
-import com.sharjil.f1intel.repository.DriverRepository;
 import com.sharjil.f1intel.repository.LapRepository;
 import com.sharjil.f1intel.repository.RawSnapshotRepository;
 import org.slf4j.Logger;
