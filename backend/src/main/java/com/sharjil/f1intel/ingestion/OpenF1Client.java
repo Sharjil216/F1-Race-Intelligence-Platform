@@ -1,10 +1,7 @@
 package com.sharjil.f1intel.ingestion;
 
 
-import com.sharjil.f1intel.domain.Driver;
-import com.sharjil.f1intel.domain.Lap;
-import com.sharjil.f1intel.domain.Meeting;
-import com.sharjil.f1intel.domain.Session;
+import com.sharjil.f1intel.domain.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import tools.jackson.core.type.TypeReference;
@@ -79,6 +76,36 @@ public class OpenF1Client {
                 .body(String.class);
 
         List<Lap> parsed = jsonMapper.readValue(raw, new TypeReference<List<Lap>>() {});
+
+        return new FetchResult<>(raw, parsed);
+    }
+
+    public FetchResult<Stint> fetchStints(int sessionKey) {
+        String raw =  restClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/stints")
+                        .queryParam("session_key", sessionKey)
+                        .build())
+                .retrieve()
+                .body(String.class);
+
+        List<Stint> parsed = jsonMapper.readValue(raw, new TypeReference<List<Stint>>() {});
+
+        return new FetchResult<>(raw, parsed);
+    }
+
+    public FetchResult<Pit> fetchPits(int sessionKey) {
+        String raw =  restClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/pit")
+                        .queryParam("session_key", sessionKey)
+                        .build())
+                .retrieve()
+                .body(String.class);
+
+        List<Pit> parsed = jsonMapper.readValue(raw, new TypeReference<List<Pit>>() {});
 
         return new FetchResult<>(raw, parsed);
     }

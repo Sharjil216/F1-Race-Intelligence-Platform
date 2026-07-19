@@ -1,9 +1,6 @@
 package com.sharjil.f1intel.api;
 
-import com.sharjil.f1intel.ingestion.DriverIngestionService;
-import com.sharjil.f1intel.ingestion.LapIngestionService;
-import com.sharjil.f1intel.ingestion.MeetingIngestionService;
-import com.sharjil.f1intel.ingestion.SessionIngestionService;
+import com.sharjil.f1intel.ingestion.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,12 +13,21 @@ public class IngestionController {
     private final SessionIngestionService sessionIngestionService;
     private final DriverIngestionService driverIngestionService;
     private final LapIngestionService lapIngestionService;
+    private final StintIngestionService stintIngestionService;
+    private final PitIngestionService pitIngestionService;
 
-    public IngestionController(MeetingIngestionService meetingIngestionService, SessionIngestionService sessionIngestionService, DriverIngestionService driverIngestionService, LapIngestionService lapIngestionService) {
+    public IngestionController(MeetingIngestionService meetingIngestionService,
+                               SessionIngestionService sessionIngestionService,
+                               DriverIngestionService driverIngestionService,
+                               LapIngestionService lapIngestionService,
+                               StintIngestionService stintIngestionService,
+                               PitIngestionService pitIngestionService) {
         this.meetingIngestionService = meetingIngestionService;
         this.sessionIngestionService = sessionIngestionService;
         this.driverIngestionService = driverIngestionService;
         this.lapIngestionService = lapIngestionService;
+        this.stintIngestionService = stintIngestionService;
+        this.pitIngestionService = pitIngestionService;
     }
 
     @PostMapping("/meetings")
@@ -50,6 +56,19 @@ public class IngestionController {
         int ingested = lapIngestionService.ingestLaps(sessionKey);
 
         return new IngestionResult("laps", ingested);
+    }
+
+    @PostMapping("/stints")
+    public IngestionResult ingestStints(int sessionKey) {
+        int ingested = stintIngestionService.ingestStints(sessionKey);
+
+        return new IngestionResult("stints", ingested);
+    }
+    @PostMapping("/pits")
+    public IngestionResult ingestPits(int sessionKey) {
+        int ingested = pitIngestionService.ingestPits(sessionKey);
+
+        return new IngestionResult("pits", ingested);
     }
 
     public record IngestionResult(String endpoint, int ingested) {}
