@@ -28,4 +28,20 @@ class StintIngestionServiceIT extends AbstractIngestionServiceIT {
         assertEquals(EXPECTED_STINTS, countRows("stint"));
     }
 
+    @Test
+    void mapsStintFieldsCorrectly() {
+        stintIngestionService.ingestStints(9558);
+
+        var row = jdbcClient.sql("""
+            SELECT lap_start, lap_end, compound
+            FROM stint
+            WHERE session_key = 9558 AND driver_number = 77 AND stint_number = 1
+            """)
+                .query((rs, n) -> new int[]{rs.getInt("lap_start"), rs.getInt("lap_end")})
+                .single();
+
+        assertEquals(1, row[0]);
+        assertEquals(26, row[1]);
+    }
+
 }
