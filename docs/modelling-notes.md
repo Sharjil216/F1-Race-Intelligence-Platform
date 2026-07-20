@@ -327,3 +327,78 @@ I want to clarify these limitations because a number without its assumptions is 
 - Handle the deferred contaminants: safety car detection, weather regime detection.
 - Run the model against Silverstone (9558, wet-dry-wet) as a negative test - a well behaved
   model should produce obvious nonsense or refuse, and that's worth demonstrating.
+
+--- 
+
+## What adding traffic detection to the model did?
+
+Using my model for race state reconstruction, I was able to accurately plot the drivers positions per lap.
+Note, that this model shows the drivers in relation to each other on the track at a given leading lap, so lapped cars 
+could still be shown ahead as other cars due to them not being on the leading lap. Using this race state model, i was able
+to accurately plot the traffic for all drivers in any given session and lap within that session, giving me the values of
+a drivers **gap to the leader**(`gap_to_leader`) and **gap to the car ahead**(`gap_to_ahead`).
+
+This was done by calculating the total elapsed driving time at the end of a lap for a driver, represented as `running_total`.
+To work out the drivers running total, I first used `PARTION BY` on the sum of lap durations to calculate a separate total 
+for each driver, then ordered by lap number.
+To gauge a drivers position, I used a similar command to order drivers by their running total. Using clever methods such
+as `FIRST_VALUE()` and `LAG()` I was able to compute a drivers gap to the race leader, and to the car ahead.
+
+I used the race state model for traffic calculation, and combined it with the tyre degradation engine. Excluding data from
+laps where a driver encountered traffic would ideally give me a better idea of tyre degradation as a whole. I estimated that 
+a car would be in the car aheads dirty air, if it was within 1.5s from it, derived from the 1s ruling for DRS enabling. 
+Dirty air would lead to longer lap times, increased tyre degradation and skew my slope, so i removed laps where this occurred.
+This led to 16-41% of laps being removed depending on compound. This also slightly improved R^2 at Barcelona (MEDIUM 0.29→0.32, SOFT 0.08→0.12, HARD unchanged),
+and marginally in Monza.
+More usefully, i found that slopes were nearly unchanged. Medium tyres moved from 0.0664 -> 0.0676 despite losing 18% of its data.
+That stability under selective removal is evidence that the slope estimates are robust even when R^2 is low.
+
+I thought this would be where i stopped tuning the model, but i then had an idea. What if i looked at the average race pace of a tyre
+at a certain tyre age range for every single driver. So i grouped laps into three lap tyre-age bands and averaged the delta from each
+stints own mean, which showed the **relationship isnt a straight line**. All compounds climb steadily to age 12-15, then diverge. Soft
+turns sharply upwards at Barcelona (0.32 → 0.43 → 0.91 s), medium flattens after 18, hard plateaus then jumps. Monza shows an initial 
+dip (tyre warm up which is visible due to a weak degradation circuit) before climbing. This explains the regression instability, a single
+line through several regimes gives a slope that depends where you cut the window.
+The gradients over the well populated 3-18 bang showed that Monza's hard was 0.016 s/lap, and medium 0.022 compared to Barcelonas hard 
+0.040, medium 0.058, soft 0.050. Again showing Barcelona is ~2.5x Monza on both shared compounds, verifying the ration found by regression.
+
+The final sql
+
+```sql
+WITH stint_laps AS (
+    SELECT s.driver_number,
+           s.stint_number,
+           s.compound,
+           l.lap_number,
+           l.lap_duration,
+           s.tyre_age_at_start + (l.lap_number - s.lap_start) AS tyre_age,
+           l.lap_duration + 0.035 * l.lap_number              AS fuel_corrected
+    FROM stint s
+        JOIN lap l
+            ON  l.session_key   = s.session_key
+            AND l.driver_number = s.driver_number
+            AND l.lap_number > s.lap_start
+            AND l.lap_number < s.lap_end
+    WHERE s.session_key = 9539
+      AND l.lap_duration IS NOT NULL
+),
+stint_stats AS (
+    SELECT driver_number,
+            tint_number,
+            AVG(fuel_corrected)                                       AS stint_avg,
+            PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY lap_duration) AS stint_median
+    FROM stint_laps
+    GROUP BY driver_number, stint_number
+)
+SELECT sl.compound,
+       (sl.tyre_age / 3) * 3                                    AS age_bucket,
+       COUNT(*)                                                 AS laps,
+       ROUND(AVG(sl.fuel_corrected - ss.stint_avg)::numeric, 3) AS avg_delta
+FROM stint_laps sl
+    JOIN stint_stats ss
+        ON  ss.driver_number = sl.driver_number
+        AND ss.stint_number  = sl.stint_number
+WHERE sl.lap_duration <= 1.07 * ss.stint_median
+GROUP BY sl.compound, (sl.tyre_age / 3) * 3
+ORDER BY sl.compound, age_bucket;
+```
