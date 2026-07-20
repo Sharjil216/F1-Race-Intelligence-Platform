@@ -2,6 +2,7 @@ package com.sharjil.f1intel.api;
 
 import com.sharjil.f1intel.engine.DegradationService;
 import com.sharjil.f1intel.engine.RaceStateRepository;
+import com.sharjil.f1intel.engine.model.DegradationCurveResult;
 import com.sharjil.f1intel.engine.model.DegradationResult;
 import com.sharjil.f1intel.engine.model.RaceStateResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,11 @@ public class AnalysisController {
     @GetMapping("/degradation")
     public List<DegradationResult> degradationByCompound(@RequestParam int sessionKey) {
         return degradationService.degradationByCompound(sessionKey);
+    }
+
+    @GetMapping("/degradation-curve")
+    public List<DegradationCurveResult> degradationCurveBySession(@RequestParam int sessionKey) {
+        return degradationService.degradationCurveBySession(sessionKey);
     }
 
     @GetMapping("/race-state")
