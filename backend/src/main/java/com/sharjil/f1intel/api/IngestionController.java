@@ -15,19 +15,22 @@ public class IngestionController {
     private final LapIngestionService lapIngestionService;
     private final StintIngestionService stintIngestionService;
     private final PitIngestionService pitIngestionService;
+    private final PositionIngestionService positionIngestionService;
 
     public IngestionController(MeetingIngestionService meetingIngestionService,
                                SessionIngestionService sessionIngestionService,
                                DriverIngestionService driverIngestionService,
                                LapIngestionService lapIngestionService,
                                StintIngestionService stintIngestionService,
-                               PitIngestionService pitIngestionService) {
+                               PitIngestionService pitIngestionService,
+                               PositionIngestionService positionIngestionService) {
         this.meetingIngestionService = meetingIngestionService;
         this.sessionIngestionService = sessionIngestionService;
         this.driverIngestionService = driverIngestionService;
         this.lapIngestionService = lapIngestionService;
         this.stintIngestionService = stintIngestionService;
         this.pitIngestionService = pitIngestionService;
+        this.positionIngestionService = positionIngestionService;
     }
 
     @PostMapping("/meetings")
@@ -69,6 +72,13 @@ public class IngestionController {
         int ingested = pitIngestionService.ingestPits(sessionKey);
 
         return new IngestionResult("pits", ingested);
+    }
+
+    @PostMapping("/positions")
+    public IngestionResult ingestPositions(int sessionKey) {
+        int ingested = positionIngestionService.ingestPositions(sessionKey);
+
+        return new IngestionResult("positions", ingested);
     }
 
     public record IngestionResult(String endpoint, int ingested) {}

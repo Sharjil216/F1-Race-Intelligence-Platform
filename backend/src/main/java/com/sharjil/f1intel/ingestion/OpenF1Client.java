@@ -109,4 +109,19 @@ public class OpenF1Client {
 
         return new FetchResult<>(raw, parsed);
     }
+
+    public FetchResult<Position> fetchPosition(int sessionKey) {
+        String raw =  restClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/position")
+                        .queryParam("session_key", sessionKey)
+                        .build())
+                .retrieve()
+                .body(String.class);
+
+        List<Position> parsed = jsonMapper.readValue(raw, new TypeReference<List<Position>>() {});
+
+        return new FetchResult<>(raw, parsed);
+    }
 }
