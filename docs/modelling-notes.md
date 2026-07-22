@@ -442,3 +442,40 @@ within a lap number diverges from official classification because lapped cars co
 **Known limitations:** ranking compares drivers at the same lap number, which stops
 meaning track position once cars are lapped, the final lap is the weakest case.
 Mid-race retirements briefly desynchronise the two numbering schemes for one lap.
+
+---
+## Pit loss
+
+Pit loss is the time a stop costs *relative to not stopping* which will be the input a strategy
+simulator needs. The API doesn't provide pit loss, `stop_duration` is null throughout, and
+`pit_duration` (~29s at Monza) is pit entry to pit exit, not time lost, since the driver
+would have covered that stretch of road anyway.
+
+**So I derived it instead**, using the same self-comparison trick as the degradation model:
+
+```
+pit loss = (in-lap + out-lap) − 2 × (driver's median pace over the 4 clean laps before the stop)
+```
+
+Two details that came out of the data rather than from reasoning:
+
+- **A stop damages two laps.** The `pit` table records the *in*-lap, the out-lap is
+  `lap_number + 1` and is marked true with `is_pit_out_lap`. At Monza the in-lap is only ~4s slower
+  (braking for entry) while the out-lap is ~20s. Looking at one lap misses a fifth of the cost.
+- **The reference must be the laps *before* the stop.** After the stop the driver is ~2s/lap
+  quicker on fresh tyres and lighter fuel which is pace they only have *because* they pitted. Using
+  post pit stop laps as the reference would inflate the figure by ~4s.
+
+**Monza result:** The median pit loss was 24.7s across 30 stops, most in a 23.3–25.8s band, consistent 
+with the figure usually quoted for the circuit.
+
+The two components behave differently. The in-lap loss is tightly clustered (3.9–6.1s down to
+circuit geometry), while out-lap loss ranges 18.6–33.6s. All five outliers are out-lap only,
+most likely rejoining into traffic.
+
+**Caveat:** this figure conflates pit lane time with the cost of a cold tyre out-lap. For
+strategy purposes that's the right total (both are consequences of stopping), but it shouldn't
+be called "pit lane loss".
+
+Median rather than mean, for the usual reason that it absorbs the traffic affected stops without
+anyone having to decide which to exclude.
