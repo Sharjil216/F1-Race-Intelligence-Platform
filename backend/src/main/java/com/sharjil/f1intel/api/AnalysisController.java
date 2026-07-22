@@ -1,9 +1,6 @@
 package com.sharjil.f1intel.api;
 
-import com.sharjil.f1intel.engine.DegradationService;
-import com.sharjil.f1intel.engine.PitLossRepository;
-import com.sharjil.f1intel.engine.PitLossService;
-import com.sharjil.f1intel.engine.RaceStateRepository;
+import com.sharjil.f1intel.engine.*;
 import com.sharjil.f1intel.engine.model.DegradationCurveResult;
 import com.sharjil.f1intel.engine.model.DegradationResult;
 import com.sharjil.f1intel.engine.model.PitLossSummary;
@@ -20,12 +17,12 @@ import java.util.List;
 public class AnalysisController {
 
     private final DegradationService degradationService;
-    private final RaceStateRepository raceStateRepository;
+    private final RaceStateService raceStateService;
     private final PitLossService pitLossService;
 
-    public AnalysisController(DegradationService degradationService, RaceStateRepository raceStateRepository,  PitLossService pitLossService) {
+    public AnalysisController(DegradationService degradationService, RaceStateService raceStateService,  PitLossService pitLossService) {
         this.degradationService = degradationService;
-        this.raceStateRepository = raceStateRepository;
+        this.raceStateService = raceStateService;
         this.pitLossService = pitLossService;
     }
 
@@ -41,7 +38,7 @@ public class AnalysisController {
 
     @GetMapping("/race-state")
     public List<RaceStateResult> raceStateBySessionAndLap(@RequestParam int sessionKey, @RequestParam int lap) {
-        return raceStateRepository.raceStateBySessionAndLap(sessionKey, lap);
+        return raceStateService.raceStateBySessionKeyAndLap(sessionKey, lap);
     }
 
     @GetMapping("/pit-loss")
