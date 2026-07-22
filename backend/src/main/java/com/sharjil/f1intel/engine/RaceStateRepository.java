@@ -17,14 +17,16 @@ public class RaceStateRepository {
                 SELECT l.lap_number,
                        l.driver_number,
                        l.lap_duration,
-                       SUM(l.lap_duration) OVER (PARTITION BY l.driver_number ORDER BY lap_number) AS running_total
+                       l.date_start + (l.lap_duration * INTERVAL '1 second') AS lap_end_time
                 FROM lap l
                 WHERE session_key = :sessionKey
             )
-            SELECT RANK() OVER (PARTITION BY lap_number ORDER BY running_total) AS position,
+            SELECT RANK() OVER (PARTITION BY lap_number ORDER BY lap_end_time) AS position,
                     driver_number,
-                    running_total - FIRST_VALUE(running_total) OVER (PARTITION BY lap_number ORDER BY running_total) AS gap_to_leader,
-                    running_total - LAG(running_total) OVER (PARTITION BY lap_number ORDER BY running_total) AS gap_to_ahead
+                    ROUND( EXTRACT(EPOCH FROM (lap_end_time - FIRST_VALUE(lap_end_time)
+                            OVER (PARTITION BY lap_number ORDER BY lap_end_time)))::numeric, 3) AS gap_to_leader,
+                    ROUND ( EXTRACT(EPOCH FROM (lap_end_time - LAG(lap_end_time)
+                            OVER (PARTITION BY lap_number ORDER BY lap_end_time)))::numeric, 3) AS gap_to_ahead
             FROM lap_totals
             WHERE lap_number = :lapNumber
             ORDER BY position;
