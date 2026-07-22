@@ -402,3 +402,43 @@ WHERE sl.lap_duration <= 1.07 * ss.stint_median
 GROUP BY sl.compound, (sl.tyre_age / 3) * 3
 ORDER BY sl.compound, age_bucket;
 ```
+
+---
+## Race state reconstruction - validated against reported positions
+
+Position, gaps and running order are reconstructed from lap timing alone.
+OpenF1 also publishes actual reported positions, allowing me to verify the reconstruction
+against ground truth rather than against expectation.
+
+**Result:** agreement with reported position, per driver-lap:
+
+| Circuit   | Driver-laps | Matches | Agreement |
+|-----------|-------------|---------|-----------|
+| Barcelona | 1309        | 1305    | 99.7%     |
+| Monza     | 1009        | 1004    | 99.5%     |
+
+**The first attempt scored 22% at Barcelona.** This was because track position was derived
+by summing lap durations into a running total, then ranking drivers by it. One driver had no lap 1
+row in the source data, so their cumulative time was one lap short for the entire
+race, putting them first and shifting everyone else down a place. Every lap after
+that was wrong.
+
+The fix was structural rather than a patch. Instead of accumulating durations, I ranked
+by each lap's absolute end time (`date_start + lap_duration`). Each lap is then
+computed independently, so a missing row affects only that row. Monza also improved
+(97.8% → 99.5%), because the same fragility was present, just not triggered.
+
+Monza alone would have shipped a reconstruction that was accidentally correct.
+
+**Method:** reported positions are event-based, a row for only when a position changes
+so comparing them to per-lap data needs an as-of join. For each driver-lap, I took the
+most recent position event at or before that lap's end time (`LEFT JOIN LATERAL`
+with `ORDER BY position_time DESC LIMIT 1`).
+
+All four mismatches at Monza are accounted for. Two are adjacent cars swapping mid-lap, where
+and end of lap snapshot and an event based feed disagree. Two are on the final lap, where ranking
+within a lap number diverges from official classification because lapped cars complete fewer laps.
+
+**Known limitations:** ranking compares drivers at the same lap number, which stops
+meaning track position once cars are lapped, the final lap is the weakest case.
+Mid-race retirements briefly desynchronise the two numbering schemes for one lap.
