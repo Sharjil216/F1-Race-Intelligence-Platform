@@ -15,6 +15,7 @@ simulation.
 - Keeps the raw API response alongside normalised tables, so any result can be traced back to source
 - Reconstructs lap by lap running order and gaps from lap times alone
 - Measures tyre degradation per compound, with fuel correction and per stint baselining
+- Strategy simulations for one stop races, returning the optimal stop lap compared to the actual stop lap, and the time lost
 
 ---
 
@@ -120,6 +121,11 @@ stint against its own average pace so that car performance and track position dr
 Method, the approaches that failed, and what each one revealed:
 [`docs/modelling-notes.md`](docs/modelling-notes.md)
 
+**Strategy simulation** - composes the degradation, race state and pit loss engines to find 
+the tyre optimal one stop lap, and compares it against what actually happened. On Leclerc's 
+winning Monza one stop, the model's optimum lands within half a second of his real call, inside the 
+uncertainty of the inputs.
+
 ---
 
 ## Limitations ❌
@@ -146,14 +152,14 @@ Method, the approaches that failed, and what each one revealed:
 - Race state reconstruction (position, gap to leader, gap to car ahead)
 - Tyre degradation analysis - per-compound slope with R², and a binned degradation curve
 - Integration tests against a real PostgreSQL container, running in CI
-
-**Next**
-
 - Validate reconstructed positions against OpenF1's reported positions, to put a number
-  on reconstruction accuracy
+    on reconstruction accuracy
 - Derive pit loss from lap-time deltas (the API's pit durations measure lane traversal,
   not time lost)
 - Strategy counterfactuals - "what if this stop had happened three laps earlier?"
+
+**Next**
+
 - Telemetry ingestion and a frontend
 
 Not yet built: anything predictive, weather handling, or the strategy simulator itself.

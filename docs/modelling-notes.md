@@ -479,3 +479,19 @@ be called "pit lane loss".
 
 Median rather than mean, for the usual reason that it absorbs the traffic affected stops without
 anyone having to decide which to exclude.
+
+---
+## Strategy counterfactual — "what if the stop had been earlier/later?"
+
+The **one stop** strategy model combines tyre degradation, the race state, and estimated time lost 
+during a pit stop. For a **two stint** race, it calculates which lap would have been the best time to pit to 
+minimise the total time lost.
+
+When applied to Leclerc’s winning one stop strategy at Monza, the model suggests that lap 20 was the best
+time to stop, while he actually stopped on lap 15. However, the difference between the two strategies is 
+only 0.449 seconds. This is too small to draw a reliable conclusion, especially because the data for hard 
+tyre degradation was weak, with an R² value of only 0.009. Therefore, the model cannot confidently say that 
+Leclerc’s actual strategy was worse.
+
+The model also assumes that tyre performance gets worse at a constant rate and that the actions of the other 
+drivers would remain unchanged. These are important limitations.
