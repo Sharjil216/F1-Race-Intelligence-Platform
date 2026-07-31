@@ -1,10 +1,7 @@
 package com.sharjil.f1intel.api;
 
 import com.sharjil.f1intel.engine.*;
-import com.sharjil.f1intel.engine.model.DegradationCurveResult;
-import com.sharjil.f1intel.engine.model.DegradationResult;
-import com.sharjil.f1intel.engine.model.PitLossSummary;
-import com.sharjil.f1intel.engine.model.RaceStateResult;
+import com.sharjil.f1intel.engine.model.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,11 +16,13 @@ public class AnalysisController {
     private final DegradationService degradationService;
     private final RaceStateService raceStateService;
     private final PitLossService pitLossService;
+    private final StrategyService strategyService;
 
-    public AnalysisController(DegradationService degradationService, RaceStateService raceStateService,  PitLossService pitLossService) {
+    public AnalysisController(DegradationService degradationService, RaceStateService raceStateService,  PitLossService pitLossService, StrategyService strategyService) {
         this.degradationService = degradationService;
         this.raceStateService = raceStateService;
         this.pitLossService = pitLossService;
+        this.strategyService = strategyService;
     }
 
     @GetMapping("/degradation")
@@ -45,4 +44,10 @@ public class AnalysisController {
     public PitLossSummary pitLossSummaryBySessionKey(@RequestParam int sessionKey) {
         return pitLossService.pitLoss(sessionKey);
     }
+
+    @GetMapping("/strategy")
+    public StrategyResult strategyResultBySessionAndDriver (@RequestParam int sessionKey, @RequestParam int driverNumber) {
+        return strategyService.getStrategy(sessionKey, driverNumber);
+    }
+
 }
