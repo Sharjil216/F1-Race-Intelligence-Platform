@@ -1,4 +1,5 @@
 import DegradationChart from "./DegradationChart"
+import RaceStatePanel from "./RaceStatePanel"
 
 const panelStyle = {
   border: '1px solid #2A2A38',
@@ -25,6 +26,7 @@ function App() {
         <div style={{display: 'flex', gap: '16px', marginTop: '10px'}}>
             <div style={{...panelStyle, flex: 1}}>
                 Race State Gaps
+                <RaceStatePanel />
             </div>
             <div style={{...panelStyle, flex: 1}}>
                 Strategy
