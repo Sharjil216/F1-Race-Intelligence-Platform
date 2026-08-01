@@ -17,18 +17,28 @@ type DriverInfo = {
 function RaceStatePanel() {
     const [raceState, setRaceState] = useState<RaceStateRow[]>([])
     const [drivers, setDrivers] = useState<DriverInfo[]>([])
+    const [lap, setLap] = useState(30)
 
     useEffect(() => {
         fetch('http://localhost:8080/api/drivers?sessionKey=9539').then(r => r.json()).then(json => {setDrivers(json)})
-        fetch('http://localhost:8080/api/analysis/race-state?sessionKey=9539&lap=30').then(r => r.json()).then(json => setRaceState(json))
-    }, [])
+        fetch(`http://localhost:8080/api/analysis/race-state?sessionKey=9539&lap=${lap}`).then(r => r.json()).then(json => setRaceState(json))
+    }, [lap])
 
     const driverLookup = new Map(drivers.map(d => [d.driverNumber, d]))
 
 
 
     return (
+        <>
         <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
+            <input
+            type="range"
+            min={1}
+            max={66}
+            value={lap}
+            onChange={(e) => setLap(Number(e.target.value))}
+            style={{accentColor: '#E10600'}}
+            /> <span>{lap}</span>
         {raceState.map((row) => {
             const driver = driverLookup.get(row.driverNumber)
             return (
@@ -41,6 +51,7 @@ function RaceStatePanel() {
             )
         })}
         </div>
+        </>
     )
 }
 
