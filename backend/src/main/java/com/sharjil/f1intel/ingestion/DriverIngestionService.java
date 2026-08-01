@@ -1,6 +1,8 @@
 package com.sharjil.f1intel.ingestion;
 
 import com.sharjil.f1intel.domain.Driver;
+import com.sharjil.f1intel.domain.model.DriverInfo;
+import com.sharjil.f1intel.repository.DriverInfoRepository;
 import com.sharjil.f1intel.repository.DriverRepository;
 import com.sharjil.f1intel.repository.RawSnapshotRepository;
 import org.slf4j.Logger;
@@ -16,12 +18,14 @@ public class DriverIngestionService {
 
     private final OpenF1Client openF1Client;
     private final DriverRepository driverRepository;
+    private final DriverInfoRepository driverInfoRepository;
     private final RawSnapshotRepository rawSnapshotRepository;
 
-    public DriverIngestionService(OpenF1Client openF1Client, DriverRepository driverRepository, RawSnapshotRepository rawSnapshotRepository) {
+    public DriverIngestionService(OpenF1Client openF1Client, DriverRepository driverRepository, RawSnapshotRepository rawSnapshotRepository, DriverInfoRepository driverInfoRepository) {
         this.openF1Client = openF1Client;
         this.driverRepository = driverRepository;
         this.rawSnapshotRepository = rawSnapshotRepository;
+        this.driverInfoRepository = driverInfoRepository;
     }
 
     public int ingestDrivers(int sessionKey) {
@@ -36,5 +40,9 @@ public class DriverIngestionService {
         log.info("Ingested {} drivers", filteredDrivers.size());
 
         return filteredDrivers.size();
+    }
+
+    public List<DriverInfo> getDrivers(int sessionKey) {
+        return driverInfoRepository.getDriverInfo(sessionKey);
     }
 }
