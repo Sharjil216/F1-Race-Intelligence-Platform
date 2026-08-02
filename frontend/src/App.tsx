@@ -1,3 +1,4 @@
+import { useState } from "react"
 import DegradationChart from "./DegradationChart"
 import RaceStatePanel from "./RaceStatePanel"
 import StrategyPanel from "./StrategyPanel"
@@ -10,6 +11,12 @@ const panelStyle = {
 }
 
 function App() {
+    const [session, setSession] = useState(9590)
+    function changeSession(e) {
+        setSession(e.target.value)
+        console.log("Current session is: " + session)
+    }
+
 
   return (
   <div style={{
@@ -21,16 +28,23 @@ function App() {
     </h1>
     <main>
         <div style={panelStyle}>
+            <h3>Session Select</h3>
+            <select name="sessions" id="sessions" onChange={changeSession}>
+                <option value="9590">Monza - 9590</option>
+                <option value="9539">Barcelona - 9539</option>
+            </select>
+        </div>
+        <div style={panelStyle}>
             Degradation Chart
-            <DegradationChart />
+            <DegradationChart sessionKey={session} />
         </div>
         <div style={{display: 'flex', gap: '16px', marginTop: '10px'}}>
             <div style={{...panelStyle, flex: 1}}>
                 Race State Gaps
-                <RaceStatePanel />
+                <RaceStatePanel sessionKey={session} />
             </div>
             <div style={{...panelStyle, flex: 1}}>
-                <StrategyPanel />
+                <StrategyPanel sessionKey={session} />
             </div>
          </div>
         

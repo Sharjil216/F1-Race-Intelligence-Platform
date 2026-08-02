@@ -30,14 +30,14 @@ function reshapeForChart(flat: CurvePoint[]) {
     .sort((a, b) => a.ageBucket - b.ageBucket)
 }
 
-function DegradationChart() {
+function DegradationChart({ sessionKey }: { sessionKey: number }) {
     const [chartData, setChartData] = useState<ChartRow[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/analysis/degradation-curve?sessionKey=9539')
+    fetch(`http://localhost:8080/api/analysis/degradation-curve?sessionKey=${sessionKey}`)
         .then((r) => r.json())
         .then((json) => setChartData(reshapeForChart(json)))
-    }, [])
+    }, [sessionKey])
 
     return (
     <div style={{ height: 400 }}>

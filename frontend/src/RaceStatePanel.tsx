@@ -14,15 +14,15 @@ type DriverInfo = {
     nameAcronym: string
 }
 
-function RaceStatePanel() {
+function RaceStatePanel({ sessionKey }: { sessionKey: number }) {
     const [raceState, setRaceState] = useState<RaceStateRow[]>([])
     const [drivers, setDrivers] = useState<DriverInfo[]>([])
     const [lap, setLap] = useState(30)
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/drivers?sessionKey=9539').then(r => r.json()).then(json => {setDrivers(json)})
-        fetch(`http://localhost:8080/api/analysis/race-state?sessionKey=9539&lap=${lap}`).then(r => r.json()).then(json => setRaceState(json))
-    }, [lap])
+        fetch(`http://localhost:8080/api/drivers?sessionKey=${sessionKey}`).then(r => r.json()).then(json => {setDrivers(json)})
+        fetch(`http://localhost:8080/api/analysis/race-state?sessionKey=${sessionKey}&lap=${lap}`).then(r => r.json()).then(json => setRaceState(json))
+    }, [sessionKey, lap])
 
     const driverLookup = new Map(drivers.map(d => [d.driverNumber, d]))
 
