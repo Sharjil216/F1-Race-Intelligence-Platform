@@ -24,7 +24,7 @@ function App() {
     fontFamily: 'system-ui, sans-serif', padding: 32
   }}>
     <h1 style={{ fontWeight: 600, letterSpacing: '-0.02em' }}>
-      <span style={{ color: '#E10600' }}>▎</span> F1 Race Intelligence - Barcelona 2024
+      <span style={{ color: '#E10600' }}>▎</span> F1 Race Intelligence - 2024
     </h1>
     <main>
         <div style={panelStyle}>
