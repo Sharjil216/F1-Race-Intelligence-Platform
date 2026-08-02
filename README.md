@@ -2,10 +2,10 @@
 
 # F1 Race Intelligence Platform 🏎️ 💫
 
-The **F1 Race Intelligence Platform** is a A Java-based race intelligence and strategy simulation platform 
+The **F1 Race Intelligence Platform** is a java based race intelligence and strategy simulation platform 
 that ingests public F1 telemetry/timing data, stores it in a time-series database, reconstructs race state,
 models tyre degradation, and evaluates counterfactual strategy options using analytics and Monte Carlo
-simulation.
+simulation, presenting it in a dashboard.
 
 ---
 
@@ -19,7 +19,14 @@ simulation.
 
 ---
 
-## Example 📸
+## Example - Frontend 📸
+
+![F1 Race Intelligence dashboard](docs/dashboard.png)
+
+---
+
+## Example - Backend 📸
+
 
 ```bash
 curl "http://localhost:8080/api/analysis/race-state?sessionKey=9590&lap=30"
