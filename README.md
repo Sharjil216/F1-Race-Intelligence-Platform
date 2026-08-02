@@ -21,7 +21,7 @@ simulation, presenting it in a dashboard.
 
 ## Example - Frontend 📸
 
-![F1 Race Intelligence dashboard](docs/dashboard.png)
+![F1 Race Intelligence dashboard](docs/dashboard.gif)
 
 ---
 
