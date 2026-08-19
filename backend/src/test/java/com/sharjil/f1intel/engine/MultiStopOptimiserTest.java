@@ -12,7 +12,7 @@ public class MultiStopOptimiserTest {
 
     @Test
     public void doesNotStopWhenPitLossOutweighsTyreSaving() {
-        MultiStopOptimiser optimiser = new MultiStopOptimiser(10, 20.0, Map.of("A", 0.05, "B", 0.02));
+        MultiStopOptimiser optimiser = new MultiStopOptimiser(10, 20.0, Map.of("A", 0.05, "B", 0.02), Map.of("A", 999, "B", 999));
 
         assertEquals(0.90, optimiser.bestCost(1).cost(), 0.001);
     }
@@ -20,7 +20,7 @@ public class MultiStopOptimiserTest {
     @Test
     public void stopsWhenTyreSavingBeatsPitLoss() {
         MultiStopOptimiser optimiser = new MultiStopOptimiser(
-                20, 2.0, Map.of("A", 0.05));
+                20, 2.0, Map.of("A", 0.05), Map.of("A", 999));
 
         MultiStopOptimiser.Result result = optimiser.bestCost(1);
         System.out.println("Best cost stints: " + result.stints());
@@ -30,7 +30,7 @@ public class MultiStopOptimiserTest {
     @Test
     public void costsAnActualStrategyCorrectly() {
         MultiStopOptimiser optimiser = new MultiStopOptimiser(
-                53, 24.7, Map.of("MEDIUM", 0.0256, "HARD", 0.0150));
+                53, 24.7, Map.of("MEDIUM", 0.0256, "HARD", 0.0150), Map.of("MEDIUM", 999, "HARD", 999));
 
         List<Stint> actual = List.of(
                 new Stint("MEDIUM", 1, 15),
@@ -38,5 +38,16 @@ public class MultiStopOptimiserTest {
         );
 
         assertEquals(37.933, optimiser.costOfStrategy(actual), 0.01);
+    }
+
+    @Test
+    public void forcesAStopWhenNoTyreCanLastTheRace() {
+        MultiStopOptimiser optimiser = new MultiStopOptimiser(
+                40, 2.0, Map.of("A", 0.05), Map.of("A", 25));
+
+        MultiStopOptimiser.Result result = optimiser.bestCost(3);
+        System.out.println(result.stints());
+
+        assertEquals(true, result.stints().size() > 1);
     }
 }
