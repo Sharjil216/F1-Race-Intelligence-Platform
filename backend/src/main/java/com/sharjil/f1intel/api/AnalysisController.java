@@ -15,12 +15,14 @@ public class AnalysisController {
     private final RaceStateService raceStateService;
     private final PitLossService pitLossService;
     private final StrategyService strategyService;
+    private final MultiStopStrategyService multiStopStrategyService;
 
-    public AnalysisController(DegradationService degradationService, RaceStateService raceStateService,  PitLossService pitLossService, StrategyService strategyService) {
+    public AnalysisController(DegradationService degradationService, RaceStateService raceStateService,  PitLossService pitLossService, StrategyService strategyService,  MultiStopStrategyService multiStopStrategyService) {
         this.degradationService = degradationService;
         this.raceStateService = raceStateService;
         this.pitLossService = pitLossService;
         this.strategyService = strategyService;
+        this.multiStopStrategyService = multiStopStrategyService;
     }
 
     @GetMapping("/degradation")
@@ -48,4 +50,8 @@ public class AnalysisController {
         return strategyService.getStrategy(sessionKey, driverNumber);
     }
 
+    @GetMapping("/multi-stop-strategy")
+    public MultiStopStrategyService.MultiStopStrategyResult multiStopStrategyBySessionKey(@RequestParam int sessionKey, @RequestParam int driverNumber) {
+        return multiStopStrategyService.getMultiStopStrategy(sessionKey, driverNumber);
+    }
 }
