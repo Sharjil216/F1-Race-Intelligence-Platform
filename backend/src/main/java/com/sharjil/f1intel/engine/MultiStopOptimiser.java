@@ -16,10 +16,13 @@ public class MultiStopOptimiser {
 
     private final Map<String, Result> cache = new HashMap<>();
 
-    public MultiStopOptimiser(int totalLaps, double pitLoss, Map<String, Double> slopes) {
+    private final Map<String, Integer> maxStintLength;
+
+    public MultiStopOptimiser(int totalLaps, double pitLoss, Map<String, Double> slopes, Map<String, Integer> maxStintLength) {
         this.totalLaps = totalLaps;
         this.pitLoss = pitLoss;
         this.slopes = slopes;
+        this.maxStintLength = maxStintLength;
     }
 
     private double stintCost(double k, int length) {
@@ -41,18 +44,28 @@ public class MultiStopOptimiser {
             double k = entry.getValue();
 
             int lengthToEnd = totalLaps - startLap + 1;
-            double costToEnd = stintCost(k, lengthToEnd);
 
-            if (best == null || costToEnd < best.cost()) {
-                List<Stint> stints = List.of(new Stint(compound, startLap, totalLaps));
-                best = new Result(costToEnd, stints);
+            int cap = maxStintLength.get(compound);
+
+            if (lengthToEnd <= cap) {
+                double costToEnd = stintCost(k, lengthToEnd);
+
+                if (best == null || costToEnd < best.cost()) {
+                    List<Stint> stints = List.of(new Stint(compound, startLap, totalLaps));
+                    best = new Result(Math.round(costToEnd * 1000) / 1000.0, stints);
+                }
             }
 
+
             if (stopsRemaining  > 0) {
-                for (int e = startLap; e < totalLaps; e++) {
+                int maxEnd = Math.min(totalLaps - 1, startLap + cap - 1);
+                for (int e = startLap; e <= maxEnd; e++) {
                     int startLength = e - startLap + 1;
                     double thisStint = stintCost(k, startLength);
                     Result rest = bestCostFrom(e + 1, stopsRemaining - 1);
+                    if (rest == null) {
+                        continue;
+                    }
                     double total = thisStint + pitLoss + rest.cost();
 
                     if (best == null || total < best.cost()) {
@@ -60,7 +73,7 @@ public class MultiStopOptimiser {
                         stints.add(new Stint(compound, startLap, e));
                         stints.addAll(rest.stints());
 
-                        best = new Result(total, stints);
+                        best = new Result(Math.round(total * 1000) / 1000.0, stints);
                     }
                 }
             }
@@ -71,7 +84,15 @@ public class MultiStopOptimiser {
     }
 
     public Result bestCost(int maxStops) {
-        return bestCostFrom(1, maxStops);
+        Result result = bestCostFrom(1, maxStops);
+
+        if (result == null) {
+            throw new UnsupportedStrategyException(
+                    "No valid strategy: the race cannot be completed within " + maxStops +
+                            " stops given tyre life limits.");
+        }
+
+        return result;
     }
 
     public double costOfStrategy(List<Stint> stints) {
