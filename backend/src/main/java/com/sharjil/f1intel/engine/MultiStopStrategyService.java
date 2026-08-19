@@ -5,6 +5,8 @@ import com.sharjil.f1intel.engine.model.Stint;
 import com.sharjil.f1intel.engine.model.StintShape;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,15 +49,20 @@ public class MultiStopStrategyService {
 
         List<Stint> stints = actualShapes.stream().map(s -> new Stint(s.compound(), s.lapStart(), s.lapEnd())).collect(Collectors.toList());
 
+        double minR2 = degByCompound.values()
+                .stream()
+                .map(DegradationResult::r2)
+                .min(Comparator.naturalOrder())
+                .map(BigDecimal::doubleValue)
+                .orElse(0.0);
 
-        MultiStopStrategyResult result = new MultiStopStrategyResult(
+        return new MultiStopStrategyResult(
                 Math.round(optimiser.costOfStrategy(stints) * 1000) / 1000.0,
             optimiser.bestCost(stints.size() - 1),
-            optimiser.bestCost(3)
+            optimiser.bestCost(3),
+                Math.round(minR2 * 1000) / 1000.0
         );
-
-        return result;
     }
 
-    public record MultiStopStrategyResult(double costOfStrategy, MultiStopOptimiser.Result matchedOptimal, MultiStopOptimiser.Result bestOverall) {}
+    public record MultiStopStrategyResult(double costOfStrategy, MultiStopOptimiser.Result matchedOptimal, MultiStopOptimiser.Result bestOverall, double worstR2) {}
 }
