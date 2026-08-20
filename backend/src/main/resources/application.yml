@@ -2,9 +2,13 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   datasource:
-    url: jdbc:postgresql://localhost:5432/f1intel
-    username: f1intel
-    password: f1intel
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/f1intel}
+    username: ${DB_USERNAME:f1intel}
+    password: ${DB_PASSWORD:f1intel}
 
 openf1:
   base-url: https://api.openf1.org/v1
+
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
