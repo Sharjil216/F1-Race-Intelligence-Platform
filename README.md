@@ -16,12 +16,14 @@ simulation, presenting it in a dashboard.
 - Reconstructs lap by lap running order and gaps from lap times alone
 - Measures tyre degradation per compound, with fuel correction and per stint baselining
 - Strategy simulations for one stop races, returning the optimal stop lap compared to the actual stop lap, and the time lost
+- Optimal pit strategy search using a dynamic programming optimiser that finds tyre cheapest strategy across any number of stops, constrained by tyre life, and compares it to what the driver actually did
 
 ---
 
 ## Example - Frontend 📸
 
 ![F1 Race Intelligence dashboard](docs/dashboard.gif)
+![Multi Stop Strategy Panel](docs/strategy.png)
 
 ---
 
@@ -168,6 +170,8 @@ uncertainty of the inputs.
 **Next**
 
 - Telemetry ingestion and a frontend
+- Derive tyre caps from degradation curves
+- Safety car modelling
 
 Not yet built: anything predictive, weather handling, or the strategy simulator itself.
 

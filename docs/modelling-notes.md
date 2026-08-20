@@ -495,3 +495,42 @@ Leclerc’s actual strategy was worse.
 
 The model also assumes that tyre performance gets worse at a constant rate and that the actions of the other 
 drivers would remain unchanged. These are important limitations.
+
+---
+## Multi stop strategy optimisation
+
+The one stop counterfactual only answered "was this stop lap optimal?" for a fixed two stint race. This now generalises it, given a race, find the cheapest strategy across *any* number of stops and *any* compound sequence.
+
+**Modelled as a dynamic programming problem.** Define `bestFrom(lap, stopsRemaining)` - the minimum tyre cost to finish from `lap` on a fresh tyre, using at most `stopsRemaining` more stops. At each step the optimiser either runs the stint to the end
+(using no more stops) or pits at some lap and recurses on the remainder. Because the
+optimal way to finish from lap L depends only on L and the stops left - not on how you
+reached L - the same subproblems recur, so results are memoised. This collapses an
+exponential search into roughly quadratic time.
+
+**Pit loss becomes load bearing.** In the one stop model, stop count was fixed, so pit
+loss cancelled out of the comparison. Here stop count varies, so each stop must carry its
+~25s penalty explicitly - otherwise the optimiser would pit constantly to keep tyres
+fresh.
+
+**Tyre life caps force realistic strategies.** On tyre cost alone, the model preferred a
+no stop racem running the whole distance on one hard set since linear degradation
+never accumulates enough to outweigh a single pit stop. That's physically wrong as tyres
+have a finite life. A per compound maximum stint length makes running to the end illegal
+once a tyre would exceed its life, which forces the optimiser to stop. The caps are
+currently fixed assumptions (SOFT 25, MEDIUM 35, HARD 45 laps), deriving them from the
+measured degradation curves is future work.
+
+**Output.** For a given driver the endpoint returns three strategies costed under one
+model: their actual strategy, the optimal strategy at their stop count, and the optimal
+strategy overall. The invariant `bestOverall ≤ matchedOptimal ≤ actual` holds by
+construction. Example (Leclerc, Monza): actual 37.9, optimal 34.8 — but see limitations.
+
+**Limitations.**
+- No two compound rule. F1 requires two different dry compounds, the optimiser can return
+  a single compound strategy (e.g. HARD/HARD), which is illegal.
+- Tyre life caps are assumed, not measured.
+- Safety car periods are not modelled - real pit loss drops sharply under an SC, which
+  would change optimal stop timing.
+- Rests on the same degradation slopes as the one stop model, whose R² is often below
+  0.1. Every "optimal" figure inherits that uncertainty and is surfaced with a confidence
+  indicator rather than presented as fact.
