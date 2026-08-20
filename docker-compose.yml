@@ -10,6 +10,18 @@ services:
       - "5432:5432"
     volumes:
       - "data-db:/var/lib/postgresql/data"
+  backend:
+    build: ./backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/f1intel
+      DB_USERNAME: f1intel
+      DB_PASSWORD: f1intel
+      CORS_ALLOWED_ORIGIN: http://localhost:5173
+    ports:
+      - "8080:8080"
 
 volumes:
   data-db:
