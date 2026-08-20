@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
+import { API_BASE } from './config'
 
 type CurvePoint = {
   compound: string
@@ -34,7 +35,7 @@ function DegradationChart({ sessionKey }: { sessionKey: number }) {
     const [chartData, setChartData] = useState<ChartRow[]>([])
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/analysis/degradation-curve?sessionKey=${sessionKey}`)
+    fetch(`${API_BASE}/api/analysis/degradation-curve?sessionKey=${sessionKey}`)
         .then((r) => r.json())
         .then((json) => setChartData(reshapeForChart(json)))
     }, [sessionKey])

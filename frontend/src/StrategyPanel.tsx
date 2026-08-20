@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "./config"
 
 type StrategyResult = {
     driverNumber: number
@@ -28,13 +29,13 @@ function StrategyPanel({ sessionKey }: { sessionKey: number }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/drivers?sessionKey=${sessionKey}`)
+    fetch(`${API_BASE}/api/drivers?sessionKey=${sessionKey}`)
       .then(r => r.json()).then(json => setDrivers(json))
   }, [sessionKey])
 
   useEffect(() => {
     setLoading(true)
-    fetch(`http://localhost:8080/api/analysis/strategy?sessionKey=${sessionKey}&driverNumber=${driverToLookup}`)
+    fetch(`${API_BASE}/api/analysis/strategy?sessionKey=${sessionKey}&driverNumber=${driverToLookup}`)
       .then(r => r.ok ? r.json() : null)
       .then(json => {
         setStrategy(json)
@@ -44,7 +45,7 @@ function StrategyPanel({ sessionKey }: { sessionKey: number }) {
 
   const driverLookup = new Map(drivers.map(d => [d.driverNumber, d]))
 
-  function changeDriver(e) {
+  function changeDriver(e: React.ChangeEvent<HTMLSelectElement>) {
     setDriverToLookup(Number(e.target.value))
   }
 

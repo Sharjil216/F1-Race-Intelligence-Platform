@@ -46,7 +46,7 @@ function MultiStopStrategyPanel({ sessionKey }: { sessionKey: number }) {
 
     const driverLookup = new Map(drivers.map(d => [d.driverNumber, d]))
 
-    function changeDriver(e) {
+    function changeDriver(e: React.ChangeEvent<HTMLSelectElement>) {
         setDriverToLookup(Number(e.target.value))
     }
 
@@ -95,7 +95,7 @@ function MultiStopStrategyPanel({ sessionKey }: { sessionKey: number }) {
     <div>
         {driverSelector}
         <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: 2 }}>
-            MULTI-STOP - {driver.fullName} ({driver.driverNumber})
+            MULTI-STOP - {driver?.fullName ?? 'Null'} ({driver?.driverNumber ?? 'Null'})
         </div>
 
         <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: 16 }}>

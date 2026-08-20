@@ -13,9 +13,8 @@ const panelStyle = {
 
 function App() {
     const [session, setSession] = useState(9590)
-    function changeSession(e) {
-        setSession(e.target.value)
-        console.log("Current session is: " + session)
+    function changeSession(e: React.ChangeEvent<HTMLSelectElement>) {
+        setSession(Number(e.target.value))
     }
 
 
