@@ -3,9 +3,9 @@ services:
     image: timescale/timescaledb:latest-pg16
     restart: always
     environment:
-      POSTGRES_USER: f1intel
-      POSTGRES_PASSWORD: f1intel
-      POSTGRES_DB: f1intel
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -16,12 +16,18 @@ services:
     depends_on:
       - db
     environment:
-      DB_URL: jdbc:postgresql://db:5432/f1intel
-      DB_USERNAME: f1intel
-      DB_PASSWORD: f1intel
-      CORS_ALLOWED_ORIGIN: http://localhost:5173
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN}
     ports:
       - "8080:8080"
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    depends_on:
+      - backend
 
 volumes:
   data-db:
