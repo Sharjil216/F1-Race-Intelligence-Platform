@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "./config"
 
 type RaceStateRow = {
     position: number
@@ -20,8 +21,8 @@ function RaceStatePanel({ sessionKey }: { sessionKey: number }) {
     const [lap, setLap] = useState(30)
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/drivers?sessionKey=${sessionKey}`).then(r => r.json()).then(json => {setDrivers(json)})
-        fetch(`http://localhost:8080/api/analysis/race-state?sessionKey=${sessionKey}&lap=${lap}`).then(r => r.json()).then(json => setRaceState(json))
+        fetch(`${API_BASE}/api/drivers?sessionKey=${sessionKey}`).then(r => r.json()).then(json => {setDrivers(json)})
+        fetch(`${API_BASE}/api/analysis/race-state?sessionKey=${sessionKey}&lap=${lap}`).then(r => r.json()).then(json => setRaceState(json))
     }, [sessionKey, lap])
 
     const driverLookup = new Map(drivers.map(d => [d.driverNumber, d]))

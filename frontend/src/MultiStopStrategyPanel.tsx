@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { API_BASE } from "./config"
 type Stint = {
     compound: string
     startLap: number
@@ -31,13 +32,13 @@ function MultiStopStrategyPanel({ sessionKey }: { sessionKey: number }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/drivers?sessionKey=${sessionKey}`)
+        fetch(`${API_BASE}/api/drivers?sessionKey=${sessionKey}`)
         .then(r => r.json()).then(json => setDrivers(json))
     }, [sessionKey])
 
     useEffect(() => {
         setLoading(true)
-        fetch(`http://localhost:8080/api/analysis/multi-stop-strategy?sessionKey=${sessionKey}&driverNumber=${driverToLookup}`).then(r => r.json()).then(json => {
+        fetch(`${API_BASE}/api/analysis/multi-stop-strategy?sessionKey=${sessionKey}&driverNumber=${driverToLookup}`).then(r => r.json()).then(json => {
             setMultiStopRow(json)
             setLoading(false)
         })
