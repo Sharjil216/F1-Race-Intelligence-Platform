@@ -2,6 +2,7 @@ import { useState } from "react"
 import DegradationChart from "./DegradationChart"
 import RaceStatePanel from "./RaceStatePanel"
 import StrategyPanel from "./StrategyPanel"
+import MultiStopStrategyPanel from "./MultiStopStrategyPanel"
 
 const panelStyle = {
   border: '1px solid #2A2A38',
@@ -47,6 +48,10 @@ function App() {
                 <StrategyPanel sessionKey={session} />
             </div>
          </div>
+
+         <div style={panelStyle}>
+            <MultiStopStrategyPanel  sessionKey={session}/>
+        </div>
         
     </main>
   </div>
